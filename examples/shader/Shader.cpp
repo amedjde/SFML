@@ -33,9 +33,7 @@ public:
 
     bool onLoad() override
     {
-        // Load the texture and initialize the sprite
-        if (!m_texture.loadFromFile("resources/background.jpg"))
-            return false;
+        // Initialize the sprite
         m_sprite.emplace(m_texture);
 
         m_shader.setUniform("texture", sf::Shader::CurrentTexture);
@@ -55,7 +53,7 @@ public:
     }
 
 private:
-    sf::Texture               m_texture;
+    sf::Texture               m_texture{sf::Texture::loadFromFile("resources/background.jpg").value()};
     std::optional<sf::Sprite> m_sprite;
     sf::Shader m_shader{sf::Shader::loadFromFile("resources/pixelate.frag", sf::Shader::Type::Fragment).value()};
 };
@@ -184,12 +182,7 @@ public:
     {
         m_surface.setSmooth(true);
 
-        // Load the textures
-        if (!m_backgroundTexture.loadFromFile("resources/sfml.png"))
-            return false;
         m_backgroundTexture.setSmooth(true);
-        if (!m_entityTexture.loadFromFile("resources/devices.png"))
-            return false;
         m_entityTexture.setSmooth(true);
 
         // Initialize the background sprite
@@ -240,8 +233,8 @@ public:
 
 private:
     sf::RenderTexture         m_surface{sf::RenderTexture::create({800, 600}).value()};
-    sf::Texture               m_backgroundTexture;
-    sf::Texture               m_entityTexture;
+    sf::Texture               m_backgroundTexture{sf::Texture::loadFromFile("resources/sfml.png").value()};
+    sf::Texture               m_entityTexture{sf::Texture::loadFromFile("resources/devices.png").value()};
     std::optional<sf::Sprite> m_backgroundSprite;
     std::vector<sf::Sprite>   m_entities;
     sf::Shader m_shader{sf::Shader::loadFromFile("resources/edge.frag", sf::Shader::Type::Fragment).value()};
@@ -272,10 +265,6 @@ public:
             std::uniform_real_distribution<float> positionDistribution(-480, 480);
             m_pointCloud[i].position = {positionDistribution(rng), positionDistribution(rng)};
         }
-
-        // Load the texture
-        if (!m_logoTexture.loadFromFile("resources/logo.png"))
-            return false;
 
         // Load the shader
         m_shader = sf::Shader::loadFromFile("resources/billboard.vert",
@@ -319,7 +308,7 @@ public:
     }
 
 private:
-    sf::Texture               m_logoTexture;
+    sf::Texture               m_logoTexture{sf::Texture::loadFromFile("resources/logo.png").value()};
     sf::Transform             m_transform;
     std::optional<sf::Shader> m_shader;
     sf::VertexArray           m_pointCloud;
@@ -358,9 +347,7 @@ int main()
         effect->load();
 
     // Create the messages background
-    sf::Texture textBackgroundTexture;
-    if (!textBackgroundTexture.loadFromFile("resources/text-background.png"))
-        return EXIT_FAILURE;
+    const auto textBackgroundTexture = sf::Texture::loadFromFile("resources/text-background.png").value();
     sf::Sprite textBackground(textBackgroundTexture);
     textBackground.setPosition({0.f, 520.f});
     textBackground.setColor(sf::Color(255, 255, 255, 200));

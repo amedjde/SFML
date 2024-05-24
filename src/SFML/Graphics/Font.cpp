@@ -679,16 +679,16 @@ IntRect Font::findGlyphRect(Page& page, const Vector2u& size) const
             if ((textureSize.x * 2 <= Texture::getMaximumSize()) && (textureSize.y * 2 <= Texture::getMaximumSize()))
             {
                 // Make the texture 2 times bigger
-                Texture newTexture;
-                if (!newTexture.create(textureSize * 2u))
+                auto newTexture = sf::Texture::create(textureSize * 2u);
+                if (!newTexture)
                 {
                     err() << "Failed to create new page texture" << std::endl;
                     return {{0, 0}, {2, 2}};
                 }
 
-                newTexture.setSmooth(m_isSmooth);
-                newTexture.update(page.texture);
-                page.texture.swap(newTexture);
+                newTexture->setSmooth(m_isSmooth);
+                newTexture->update(page.texture);
+                page.texture.swap(*newTexture);
             }
             else
             {
@@ -757,23 +757,28 @@ bool Font::setCurrentSize(unsigned int characterSize) const
 
 
 ////////////////////////////////////////////////////////////
-Font::Page::Page(bool smooth)
-{
-    // Make sure that the texture is initialized by default
-    Image image({128, 128}, Color::Transparent);
-
-    // Reserve a 2x2 white square for texturing underlines
-    for (unsigned int x = 0; x < 2; ++x)
-        for (unsigned int y = 0; y < 2; ++y)
-            image.setPixel({x, y}, Color::White);
-
-    // Create the texture
-    if (!texture.loadFromImage(image))
+Font::Page::Page(bool smooth) :
+texture(
+    [smooth]
     {
-        err() << "Failed to load font page texture" << std::endl;
-    }
+        // Make sure that the texture is initialized by default
+        Image image({128, 128}, Color::Transparent);
 
-    texture.setSmooth(smooth);
+        // Reserve a 2x2 white square for texturing underlines
+        for (unsigned int x = 0; x < 2; ++x)
+            for (unsigned int y = 0; y < 2; ++y)
+                image.setPixel({x, y}, Color::White);
+
+        // Create the texture
+        auto maybeTexture = sf::Texture::loadFromImage(image);
+        if (!maybeTexture)
+            err() << "Failed to load font page texture" << std::endl;
+
+        auto newTexture = maybeTexture.value();
+        newTexture.setSmooth(smooth);
+        return newTexture;
+    }())
+{
 }
 
 } // namespace sf
