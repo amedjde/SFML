@@ -1,0 +1,37 @@
+#include <iostream>
+using namespace std ;
+int main ()
+{
+   
+    double number1 , number2 , number3 ;
+    char signal ;
+    cout<<" Bienvenue dans le système de calcul"<<endl;
+    cout<<"d'abord Tapez deux nombres"<<endl;
+    cin>>number1;
+     cin>>signal;
+    cin>>number2;
+    if(signal == '/')
+    {
+        cout<<(number1 / number2);
+    }
+    
+    
+    if(signal == '*')
+    {
+        cout<<(number1 * number2);
+        
+    }
+    
+    if(signal == '-' )
+    {
+        cout<<(number1 - number2);
+        
+    }
+    
+    if(signal == '+' )
+    {
+        cout<<(number1 + number2);
+        
+    }
+
+return 0 ;}
